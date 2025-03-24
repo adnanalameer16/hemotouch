@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hemotouch</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #87ceeb;
+        }
+        .container {
+            text-align: center;
+            padding: 30px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            width: 90%;
+            max-width: 500px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        label {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            color: #fff;
+            background: linear-gradient(45deg, #28a745, #218838);
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 8px 15px rgba(40, 167, 69, 0.4);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        label:hover {
+            background: linear-gradient(45deg, #218838, #1e7e34);
+            box-shadow: 0 12px 20px rgba(33, 136, 56, 0.5);
+        }
+        label:active {
+            transform: scale(0.98);
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .output {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #555;
+        }
+        button {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            color: #fff;
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 8px 15px rgba(0, 123, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: linear-gradient(45deg, #0056b3, #003f8a);
+            box-shadow: 0 12px 20px rgba(0, 86, 179, 0.5);
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Blood Group Detection</h1>
+        <label for="imageInput">Choose File</label>
+        <input type="file" id="imageInput" accept="image/*">
+        <img id="preview" src="#" alt="Image Preview" style="display: none;">
+        <button id="predictButton">Predict</button>
+        <div class="output" id="output"></div>
+    </div>
+
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const preview = document.getElementById('preview');
+        const predictButton = document.getElementById('predictButton');
+        const output = document.getElementById('output');
+        const fileLabel = document.querySelector('label[for="imageInput"]');
+
+        // Show preview of the uploaded image
+        imageInput.addEventListener('change', () => {
+            const file = imageInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+                fileLabel.textContent = `Selected: ${file.name}`;
+            } else {
+                fileLabel.textContent = 'Choose File';
+            }
+        });
+
+        // Send the image to the backend for prediction
+        predictButton.addEventListener('click', async () => {
+            const file = imageInput.files[0];
+            if (!file) {
+                output.textContent = 'Please upload an image first.';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);  // Make sure 'file' matches Flask's 'request.files['file']'
+
+            try {
+                output.textContent = 'Processing...';
+
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    output.textContent = `Prediction: ${result.prediction}`;
+                } else {
+                    output.textContent = 'Error: Unable to process the image.';
+                }
+            } catch (error) {
+                console.error(error);
+                output.textContent = 'Error: Something went wrong.';
+            }
+        });
+    </script>
+</body>
+</html>
