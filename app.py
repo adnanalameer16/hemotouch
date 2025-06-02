@@ -11,17 +11,20 @@ app = Flask(__name__)
 
 # Load all models
 model_paths = [
-    'C:/Mini Project/web/V3_model.keras',
-    'C:/Mini Project/web/best_model.keras',
-    'C:/Mini Project/web/V1_model.keras',
-    'C:/Mini Project/web/V2_model.keras'
+    'V3_model.keras',
+    'best_model.keras',
+    'V1_model.keras',
+    'V2_model.keras'
 ]
 models = [load_model(path) for path in model_paths]
 
 @app.route('/')
 def home():
-    # Render the index.html file
-    return render_template('index.html')
+    return render_template('login.html')
+
+@app.route('/home')
+def home2():
+    return render_template('hemotouch.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():
