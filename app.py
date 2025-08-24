@@ -5,6 +5,10 @@ import numpy as np
 from PIL import Image
 import io
 from collections import Counter
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -25,6 +29,13 @@ def home():
 @app.route('/home')
 def home2():
     return render_template('hemotouch.html')
+
+@app.route('/config')
+def config():
+    return jsonify({
+        'API_URL': os.environ.get('API_URL'),
+        'PREDICT_API_URL': os.environ.get('PREDICT_API_URL')
+    })
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -72,4 +83,5 @@ def predict():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=os.environ.get('FLASK_DEBUG', '0') == '1')

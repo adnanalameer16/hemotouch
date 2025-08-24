@@ -1,447 +1,268 @@
-//connection to database
-const express = require("express");
-const { Pool } = require("pg");
-const cors = require("cors");
+let apiUrl = '';
+let predictApiUrl = '';
 
-const app = express();
-app.use(cors()); // Allow frontend to access API
-app.use(express.json());
-const port = 3000;
-
-
-const pool = new Pool({
-    user: "postgres",
-    host: "localhost",
-    database: "hemotouch_db",
-    password: "adnan@28",
-    port: 5432, // Default PostgreSQL port
-  });
-
-
-// Start server
-app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
-  });
-
-
-  //API fetch donors data
-  app.get("/donors", async (req, res) => {
+async function fetchConfig() {
     try {
-      const result = await pool.query("SELECT * FROM donors");
-      res.json(result.rows);
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).send("Server Error");
-    }
-  });
-
-  //fetch pending table
-  app.get("/pending", async (req, res) => {
-    try {
-      const result = await pool.query("SELECT * FROM pending");
-      res.json(result.rows);
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).send("Server Error");
-    }
-  });
-
-  //API fetch donors-list data
-  app.get("/donorslist", async (req, res) => {
-    try {
-      const result = await pool.query("SELECT * FROM donorslist");
-      res.json(result.rows);
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).send("Server Error");
-    }
-  });
-
-
-
-  //delete pending row
-  app.delete("/pending/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
-        await pool.query("DELETE FROM pending WHERE id = $1", [id]);
-        res.json({ message: "Row deleted successfully" });
+        const response = await fetch('/config');
+        const config = await response.json();
+        apiUrl = config.API_URL;
+        predictApiUrl = config.PREDICT_API_URL;
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Deletion failed" });
+        console.error('Error fetching config:', error);
     }
-});
+}
 
+function showsection(section){
+//... existing code
+    document.querySelector('.'+section).classList.add('active');
+}
 
+function show_button_bold(selectedbutton){
+    // Remove bold class from all sidebar buttons
+    const buttons = document.querySelectorAll('.header-button');
+    buttons.forEach(button => {
+        button.classList.remove('bold');
+    });
 
-// Function to get the next available date
-const getNextAvailableDate = async () => {
-  let availableDate = new Date();
-  availableDate.setHours(0, 0, 0, 0); // Ensure the date is set to midnight
+    // Add bold class to the selected button
+    selectedbutton.classList.add('bold');
+}
 
-  while (true) {
-    const res = await pool.query(
-      "SELECT COUNT(*) FROM appointments WHERE appointment_date = $1",
-      [availableDate.toISOString().split("T")[0]]
-    );
+function setupFingerprintUpload(frameId, inputId, imageId, textId, resultId, callback) {
+    const uploadFrame = document.getElementById(frameId);
+    const imageInput = document.getElementById(inputId);
+    const uploadedImage = document.getElementById(imageId);
+    const uploadText = document.getElementById(textId);
 
-    if (parseInt(res.rows[0].count) < 3) {
-      return availableDate.toISOString().split("T")[0]; // Return as YYYY-MM-DD
-    }
-    availableDate.setDate(availableDate.getDate() + 1); // Move to the next day
-  }
-};
+    if (!uploadFrame) return; // Exit if the element doesn't exist on the page
 
-// API to insert a new donor
-app.post("/donors", async (req, res) => {
-  const { name, age, bloodgp, diseases, phno, address} = req.body;
-  const donate_date = await getNextAvailableDate();
-  try {
-    const result = await pool.query(
-      "INSERT INTO donors (name, age, bloodgp, diseases, phno, address, date_of_donation) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
-      [name, age, bloodgp, diseases, phno, address, donate_date]
-    );
-    res.status(201).json({ success: true, donor: result.rows[0] });
-  } catch (error) {
-    console.error("Error inserting donor:", error);
-    res.status(500).json({ success: false, error: "Database error" });
-  }
+    // Open file picker when clicking on the frame
+    uploadFrame.addEventListener("click", function () {
+        imageInput.click();
+    });
 
-});
+    // Handle file selection
+    imageInput.addEventListener("change", function () {
+        const file = imageInput.files[0];
 
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                uploadedImage.src = e.target.result;
+                uploadedImage.style.display = "block";
+                if (uploadText) uploadText.style.display = "none"; // Hide text when image is uploaded
+            };
+            reader.readAsDataURL(file);
 
-// API to insert a new donor to donorslist
-app.post("/all/donorslist", async (req, res) => {
-  const { name, age, bloodgp, diseases, phno, address} = req.body;
-  const hospital = "Aster Medicity";
-  const donate_date = await getNextAvailableDate();
-  try {
-    const result = await pool.query(
-      "INSERT INTO donorslist (name, age, bloodgp, diseases, phno, address, hospital, date_of_donation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
-      [name, age, bloodgp, diseases, phno, address, hospital, donate_date]
-    );
-    res.status(201).json({ success: true, donor: result.rows[0] });
-  } catch (error) {
-    console.error("Error inserting donor:", error);
-    res.status(500).json({ success: false, error: "Database error" });
-  }
-
-});
-     
-
-//API insert a request
-app.post("/pending", async (req, res) => {
-  const { name, age, bloodgp, phno, address} = req.body;
-  try {
-    const result = await pool.query(
-      "INSERT INTO pending (name, age, bloodgp, phno, address) VALUES ($1, $2, $3, $4, $5 ) RETURNING *",
-      [name, age, bloodgp, phno, address]
-    );
-    res.status(201).json({ success: true, donor: result.rows[0] });
-  } catch (error) {
-    console.error("Error inserting donor:", error);
-    res.status(500).json({ success: false, error: "Database error" });
-  }
-
-});
-
-
-//API insert a emergency request
-app.post("/pending/", async (req, res) => {
-  const { name, age, bloodgp, phno, address} = req.body;
-  try {
-    const result = await pool.query(
-      "INSERT INTO pending (name, age, bloodgp, phno, address) VALUES ($1, $2, $3, $4, $5 ) RETURNING *",
-      [name, age, bloodgp, phno, address]
-    );
-    res.status(201).json({ success: true, donor: result.rows[0] });
-  } catch (error) {
-    console.error("Error inserting donor:", error);
-    res.status(500).json({ success: false, error: "Database error" });
-  }
-
-});
-
-
-
-
-
-
-  //fetch compatible bloodgp-request
-  app.get("/compatible_bgp/:bloodGroup", async (req, res) => {
-    const { bloodGroup } = req.params;
-
-    // Validate input to prevent SQL injection
-    const allowedColumns = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
-    if (!allowedColumns.includes(bloodGroup)) {
-        return res.status(400).json({ error: "Invalid blood group" });
-    }
-
-    try {
-        const query = `SELECT "${bloodGroup}" FROM compatible_bgp WHERE "${bloodGroup}" IS NOT NULL`;
-        const result = await pool.query(query);
-
-        if (result.rows.length === 0) {
-            return res.status(404).json({ error: "No compatible blood groups found" });
+            // Send the image to Flask for prediction
+            uploadImageToFlask(file);
         }
+    });
 
-        // Extracting non-null values
-        const compatibleBloodGroups = result.rows.map(row => row[bloodGroup]);
+    // Function to send image to Flask
+    function uploadImageToFlask(file) {
+        let formData = new FormData();
+        formData.append("file", file);
 
-        res.json(compatibleBloodGroups);
-    } catch (error) {
-        console.error("Database query error:", error);
-        res.status(500).json({ error: "Internal server error" });
+        fetch(`${predictApiUrl}/predict`, {  // Flask endpoint
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Display the predicted blood group
+            const resultElement = document.querySelector(resultId);
+            if (resultElement) {
+                resultElement.textContent = data.prediction;
+            }
+            
+            // If a callback function is provided, call it with the prediction
+            if (callback) {
+                callback(data.prediction);
+            }
+        })
+        .catch(error => console.error("Error:", error));
     }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    fetchConfig().then(() => {
+        // Setup for the 'Request' section fingerprint scanner
+        setupFingerprintUpload("uploadFrame", "imageInput", "uploadedImage", "uploadText", "#disphere", fetchCompatibleBloodGroups);
+
+        // Setup for the 'Donate' section fingerprint scanner
+        setupFingerprintUpload("uploadFrame2", "imageInput2", "uploadedImage2", "uploadText2", "#disphere2");
+        
+        // Load initial data
+        loadBloodInventory();
+    });
 });
 
-//fetching donor details--compatible bgp req
-app.get("/donors/all", async (req, res) => {
-  console.log("Route /donors was hit!"); 
-  try {
-      const { bloodgp } = req.query;
-      console.log("Fetched Data:", bloodgp);
-      const result = await pool.query(
-          "SELECT name, age, bloodgp, diseases, phno, address, date_of_donation FROM donors WHERE TRIM(bloodgp) = $1",
-          [bloodgp]
-      );
-      console.log("Fetched Data:", result.rows);
+async function validateAndSubmitDonor() {
+const name = document.getElementById("name").value.trim();
+const age = document.getElementById("age").value.trim();
+const bloodgp = document.getElementById("bloodgp-dropdown-don").value;
+const diseases = document.getElementById("diseases").value.trim();
+const phno = document.getElementById("phno").value.trim();
+const address = document.getElementById("address").value.trim();
 
-      res.json(result.rows);
-  } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Database query failed" });
-  }
-});
+// 1. Check for empty fields
+if (!name || !age || !bloodgp || !diseases || !phno || !address) {
+alert("All fields are required.");
+return;
+}
 
+// 2. Format validation
+const nameRegex = /^[A-Za-z\s]+$/;
+if (!nameRegex.test(name)) {
+alert("Please enter a valid name (letters and spaces only).");
+return;
+}
 
+const ageNum = parseInt(age, 10);
+if (isNaN(ageNum) || ageNum < 18 || ageNum > 65) {
+alert("Please enter a valid age between 18 and 65.");
+return;
+}
 
-//fetch compatible bloodgp-request-emergency
-app.get("/compatible_bgp/all/:bloodGroup", async (req, res) => {
-  const { bloodGroup } = req.params;
+const phnoRegex = /^\d{10}$/;
+if (!phnoRegex.test(phno)) {
+alert("Please enter a valid 10-digit phone number.");
+return;
+}
 
-  // Validate input to prevent SQL injection
-  const allowedColumns = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
-  if (!allowedColumns.includes(bloodGroup)) {
-      return res.status(400).json({ error: "Invalid blood group" });
-  }
+// If all validation passes, proceed with submission
+const donorData = { name, age, bloodgp, diseases, phno, address };
+const bloodData = { bloodgp };
 
-  try {
-      const query = `SELECT "${bloodGroup}" FROM compatible_bgp WHERE "${bloodGroup}" IS NOT NULL`;
-      const result = await pool.query(query);
+try {
+const responses = await Promise.all([
+    fetch(`${apiUrl}/all/donorslist`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(donorData),
+    }),
+]);
 
-      if (result.rows.length === 0) {
-          return res.status(404).json({ error: "No compatible blood groups found" });
-      }
+// Check if any of the responses were not successful
+const allSuccessful = responses.every(res => res.ok);
 
-      // Extracting non-null values
-      const compatibleBloodGroups = result.rows.map(row => row[bloodGroup]);
+if (allSuccessful) {
+    // Clear input fields
+    alert("Successfully Registered");
+    document.getElementById("name").value = "";
+    document.getElementById("age").value = "";
+    document.getElementById("bloodgp-dropdown-don").value = "";
+    document.getElementById("diseases").value = "";
+    document.getElementById("phno").value = "";
+    document.getElementById("address").value = "";
+    
+    // Show success message
+    document.querySelector('.donor-details').classList.remove('activate');
+    document.querySelector('.register-success').classList.add('activate');
 
-      res.json(compatibleBloodGroups);
-  } catch (error) {
-      console.error("Database query error:", error);
-      res.status(500).json({ error: "Internal server error" });
-  }
-});
+} else {
+    // Find the first failed response to show an error
+    const failedResponse = await responses.find(res => !res.ok).json();
+    alert(`Error: ${failedResponse.error || 'An unknown error occurred.'}`);
+}
 
+} catch (error) {
+console.error("Error during submission:", error);
+alert("A network error occurred. Please try again.");
+}
+}
 
+//fetch view-donors table
+function view_donors_table(){
+    const donor_table=document.getElementById('donor-table');
+    donor_table.innerHTML = "";
+fetch(`${apiUrl}/donorslist`)
+.then(response => response.json())
+.then(data => {
+    data.forEach(donor => {
+        const row = `<tr>
+            <td>${donor.name}</td>
+            <td>${donor.age}</td>
+            <td>${donor.bloodgp}</td>
+            <td>${donor.diseases}</td>
+            <td>${donor.phno}</td>
+            <td>${donor.address}</td>
+        </tr>`;
+        donor_table.innerHTML += row;
+    });
+})
+.catch(error => console.error("Error fetching data:", error));
+}
 
+//fetch compatible bloodgp-request
+async function fetchCompatibleBloodGroups(bloodGroup) {
+    const selectedBloodGroup = bloodGroup;
+    if (!selectedBloodGroup) return;
 
-//fetching donor details--compatible bgp -emergency req
-app.get("/donorslist/all", async (req, res) => {
-  console.log("Route /donors was hit!"); 
-  try {
-      const { bloodgp } = req.query;
-      console.log("Fetched Data:", bloodgp);
-      const result = await pool.query(
-          "SELECT name, age, bloodgp, diseases, phno, address, hospital, date_of_donation FROM donorslist WHERE TRIM(bloodgp) = $1",
-          [bloodgp]
-      );
-      console.log("Fetched Data:", result.rows);
+    try {
+        const response = await fetch(`${apiUrl}/compatible_bgp/${selectedBloodGroup}`);
+        const data = await response.json();
 
-      res.json(result.rows);
-  } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Database query failed" });
-  }
-});
+        const tableBody = document.getElementById("compatible-blood-table");
+        tableBody.innerHTML = "";
 
+        if (data.length > 0) {
+            data.forEach(bloodGroup => {
+                const row = `<tr onclick="fetchDonorsByBloodGroup('${bloodGroup}')" style="cursor:pointer;"><td>${bloodGroup}</td></tr>`;
+                tableBody.innerHTML += row;
+            });
+        } else {
+            tableBody.innerHTML = "<tr><td>No data found</td></tr>";
+        }
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
+}
 
+function fetchDonorsByBloodGroup(bloodGroup) {
+    // Fetch donors from the server
+    fetch(`${apiUrl}/donors/all?bloodgp=${encodeURIComponent(bloodGroup)}`)
+        .then(response => response.json())
+        .then(data => {
+            const donorList = document.getElementById('donor-filtered-table');
+            donorList.innerHTML = ""; // Clear previous results
 
-
-//fetch compatible bloodgp-donate
-app.get("/compatible_bgp_don/:bloodGroup", async (req, res) => {
-  const { bloodGroup } = req.params;
-
-  // Validate input to prevent SQL injection
-  const allowedColumns = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
-  if (!allowedColumns.includes(bloodGroup)) {
-      return res.status(400).json({ error: "Invalid blood group" });
-  }
-
-  try {
-      const query = `SELECT "${bloodGroup}" FROM compatible_bgp_don WHERE "${bloodGroup}" IS NOT NULL`;
-      const result = await pool.query(query);
-
-      if (result.rows.length === 0) {
-          return res.status(404).json({ error: "No compatible blood groups found" });
-      }
-
-      // Extracting non-null values
-      const compatibleBloodGroups = result.rows.map(row => row[bloodGroup]);
-
-      res.json(compatibleBloodGroups);
-  } catch (error) {
-      console.error("Database query error:", error);
-      res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-
-
-// API to book an appointment
-app.post("/appointments", async (req, res) => {
-  const { name, age, bloodgp, phno, address} = req.body;
-
-
-  /*if (!patient_name || !phone) {
-    return res.status(400).json({ success: false, error: "Name and phone are required" });
-  }*/
-
-  try {
-    const scheduledDate = await getNextAvailableDate();
-
-    const result = await pool.query(
-      "INSERT INTO appointments (name, age, bloodgp, phno, address, appointment_date) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-      [name, age, bloodgp, phno, address, scheduledDate]
-    );
-
-    res.status(201).json({ success: true, appointment: result.rows[0] });
-  } catch (error) {
-    console.error("Error booking appointment:", error);
-    res.status(500).json({ success: false, error: "Database error" });
-  }
-});
-
-
-
-//fetch appointment table
-app.get("/appointments", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT * FROM appointments");
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
-  }
-});
-
-
-//delete appointment row
-app.delete("/appointments/:id", async (req, res) => {
-  try {
-      const { id } = req.params;
-      await pool.query("DELETE FROM appointments WHERE id = $1", [id]);
-      res.json({ message: "Row deleted successfully" });
-  } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Deletion failed" });
-  }
-});
-
-//blood quantity- hospital inventory-req
-app.get("/api/blood_quantity", async (req, res) => {
-  try {
-      const result = await pool.query(
-          "SELECT bloodgp, quantity FROM blood_quantity"
-      );
-      res.json(result.rows);
-  } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Internal Server Error" });
-  }
-});
+            data.forEach(donor => {
+                const row = `<tr>
+                    <td>${donor.name}</td>
+                    <td>${donor.age}</td>
+                    <td>${donor.bloodgp}</td>
+                    <td>${donor.diseases}</td>
+                    <td>${donor.phno}</td>
+                    <td>${donor.address}</td>
+                    <td>${donor.date_of_donation}</td>
+                    </tr>`;
+                    donorList.innerHTML += row;
+            });
+            showsection("donor-filtered");
+        })
+        .catch(error => console.error("Error fetching donors:", error));
+}
 
 
-//blood quantity- hospital inventory-don
-app.get("/apii/blood_quantity", async (req, res) => {
-  try {
-      const result = await pool.query(
-          "SELECT bloodgp, quantity FROM blood_quantity"
-      );
-      res.json(result.rows);
-  } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Internal Server Error" });
-  }
-});
+//blood quantity in hospital inventory-request
+async function loadBloodInventory() {
+    try {
+        const response = await fetch(`${apiUrl}/api/blood_quantity`);
+        const data = await response.json();
 
+        const tableBody = document.getElementById("bloodgp-quantity-table");
+        tableBody.innerHTML = ""; // Clear existing rows
 
-//blood quantity- hospital inventory-emergency
-app.get("/apiiii/blood_quantity", async (req, res) => {
-  try {
-      const result = await pool.query(
-          "SELECT bloodgp, quantity FROM blood_quantity"
-      );
-      res.json(result.rows);
-  } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-
-
-// API to update blood quantity-don
-app.post('/blood_quantity', async (req, res) => {
-  const { bloodgp } = req.body;
-
-  if (!bloodgp) {
-      return res.status(400).json({ error: 'Blood group is required' });
-  }
-
-  try {
-      await pool.query(
-          `UPDATE blood_quantity SET quantity = quantity + 1 WHERE bloodgp = $1;`,
-          [bloodgp]
-      );
-      res.json({ message: 'Blood quantity updated successfully' });
-  } catch (error) {
-      console.error('Error updating blood quantity:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-
-//decrement blood quantity
-app.post('/all/blood_quantity', async (req, res) => {
-  const { bloodgp } = req.body;
-
-  if (!bloodgp) {
-      return res.status(400).json({ error: 'Blood group is required' });
-  }
-
-  try {
-      await pool.query(
-          `UPDATE blood_quantity SET quantity = GREATEST(quantity - 1, 0) WHERE bloodgp = $1;`, 
-          [bloodgp]
-      );
-
-      //res.json({ message: 'Blood quantity decremented successfully' });
-  } catch (error) {
-      console.error('Error decrementing blood quantity:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-
-//pichart
-app.get('/apiii/blood_quantity', async (req, res) => {
-  try {
-      const result = await pool.query('SELECT bloodgp, quantity FROM blood_quantity');
-      res.json(result.rows);
-  } catch (error) {
-      console.error('Error fetching blood quantity:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
+        data.forEach((item) => {
+            const row = `<tr>
+                    <td>${item.bloodgp}</td>
+                    <td>${item.quantity} Unit</td>
+                </tr>`;
+                tableBody.innerHTML += row;
+        });
+    } catch (error) {
+        console.error("Error fetching blood inventory:", error);
+    }
+}

@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: hemotouch-flask
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.13
+      - key: FLASK_ENV
+        value: production
+  - type: web
+    name: hemotouch-api
+    env: node
+    buildCommand: "npm install"
+    startCommand: "node api.js"
+    envVars:
+      - key: NODE_VERSION
+        value: 18.17.1
+      - fromGroup: hemotouch-db
+groups:
+  - name: hemotouch-db
+    envVars:
+      - key: DB_USER
+        value: postgres
+      - key: DB_HOST
+        fromService:
+          type: pserv
+          name: hemotouch-db-instance
+          property: host
+      - key: DB_DATABASE
+        fromService:
+          type: pserv
+          name: hemotouch-db-instance
+          property: database
+      - key: DB_PASSWORD
+        fromService:
+          type: pserv
+          name: hemotouch-db-instance
+          property: password
+      - key: DB_PORT
+        value: 5432
+
+databases:
+  - name: hemotouch-db-instance
+    plan: free

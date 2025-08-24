@@ -1,12 +1,47 @@
 
 body{
-    
-    margin-top: 160px;
-    margin-left: 260px;
-    height: 800px;
-
-   
-    
+    margin: 0;
+    font-family: sans-serif;
+}
+.header{
+    background-color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    border-bottom: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 100;
+}
+.logo{
+    font-size: 24px;
+    font-weight: bold;
+    margin-right: auto;
+}
+.header-buttons{
+    display: flex;
+}
+.header-button{
+    padding: 10px 20px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    font-size: 16px;
+}
+.header-button:hover{
+    background-color: #f0f0f0;
+}
+.header-button.bold{
+    font-weight: bold;
+    border-bottom: 2px solid black;
+}
+.main-content{
+    margin-top: 80px;
+    padding: 20px;
 }
 #uploadText2{
     text-align: center;
@@ -19,251 +54,8 @@ body{
     align-items: center;
     margin-top: 40%;
 }
-.header{
-    background-color: white;
-   
-    
-
-    position: fixed;
-    top: 0;
-    left: 240px;
-    right: 0;
-    height: 140px;
-
-    border: none;
-    box-shadow: 5px 5px 8px -4px  rgba(0,0,0,0.5);
-
-    align-items: center;
-}
-.first-header{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding-top: 10px;
-    height: 50px;
-}
-.second-header{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-   
-    margin-right: 400px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-}
-
-
-
-.header-buttons{
-    
-    flex: 1;
-
-    display: flex;
-    height: 50px;
-    justify-content: space-around;
-    padding-left: 40px;
-    padding-right: 20px;
-    
-}
-.second-header button:hover{
-    color: black;
-    font-weight: bold;
-    font-size: 15px;
-}
-.request-button{
-    width: 90px;
-    padding-left: 10px;
-    padding-right: 10px;
-    border-radius: 10px;
-    border: none;
-    background-color: white;
-    color: black;
-    font-size: 15px;
-    cursor: pointer;
-    /*box-shadow: 2px 2px 5px rgba(0,0,0,0.15);*/
-    font-size: 12px;
-}
-.donate-button{
-    width: 90px;
-    padding-left: 10px;
-    padding-right: 10px;
-    border-radius: 10px;
-    border: none;
-    background-color: white;
-    color: black;
-    font-size: 15px;
-    cursor: pointer;
-    /*box-shadow: 2px 2px 5px rgba(0,0,0,0.15);*/
-    font-size: 12px;
-}
-.edit-button{
-    width: 90px;
-    padding-left: 10px;
-    padding-right: 10px;
-    border-radius: 10px;
-    border: none;
-    background-color: white;
-    color: black;
-    font-size: 15px;
-    cursor: pointer;
-    /*box-shadow: 2px 2px 5px rgba(0,0,0,0.15);*/
-    font-size: 12px;
-}
-.appointments-button{
-    padding-top: 15px;
-    padding-bottom: 15px;
-    border-radius: 10px;
-    border: none;
-    background-color: white;
-    color: black;
-    font-size: 15px;
-    cursor: pointer;
-    /*box-shadow: 2px 2px 5px rgba(0,0,0,0.15);*/
-    font-size: 12px;
-}
-
-.bell-icon{
-    height: 30px;
-    border-radius: 25px;
-    margin-right: 20px;
-    margin-left: 15px;
-    cursor: pointer;
-}
-.mail-icon{
-    height: 30px;
-    border-radius: 25px;
-    margin-right: 50px;
-    cursor: pointer;
-}
-.user-logo{
-    height: 30px;
-    border-radius: 25px;
-    cursor: pointer;
-    margin-right: 10px;
-}
-.arrow-down{
-    height: 30px;
-    border-radius: 25px;
-    cursor: pointer;
-    margin-left: 10px;
-}
-.sidebar{
-    background-color: white;
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 200px;
-    border: none;
-    box-shadow: 5px 5px 8px -4px  rgba(0,0,0,0.5);
-
-    display: flex;
-    flex-direction: column;
-    justify-content: top;
-    
-    padding-top: 120px;
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-bottom: 150px;
-    margin-top: 140px;
-}
-.dashboard-button{
-    padding-top: 15px;
-    padding-bottom: 15px;
-    border-radius: 25px;
-    border: none;
-    background-color: white;
-    color: black;
-    font-size: 15px;
-    cursor: pointer;
-    /*box-shadow: 2px 2px 5px rgba(0,0,0,0.15);*/
-    font-size: 12px;
-}
-.view-donors-button{
-    padding-top: 15px;
-    padding-bottom: 15px;
-    border-radius: 25px;
-    border: none;
-    background-color: white;
-    color: black;
-    font-size: 15px;
-    cursor: pointer;
-    /*box-shadow: 2px 2px 5px rgba(0,0,0,0.15);*/
-    font-size: 12px;
-}
-.view-pending-button{
-    padding-top: 15px;
-    padding-bottom: 15px;
-    border-radius: 25px;
-    border: none;
-    background-color: white;
-    color: black;
-    font-size: 15px;
-    cursor: pointer;
-   /* box-shadow: 2px 2px 5px rgba(0,0,0,0.15); */
-    font-size: 12px;
-}
-.donors-current-button{
-    padding-top: 15px;
-    padding-bottom: 15px;
-    border-radius: 25px;
-    border: none;
-    background-color: white;
-    color: black;
-    font-size: 15px;
-    cursor: pointer;
-   /* box-shadow: 2px 2px 5px rgba(0,0,0,0.15); */
-    font-size: 12px;
-}
-.emergency-request-button{
-    padding-top: 15px;
-    padding-bottom: 15px;
-    border-radius: 25px;
-    border: none;
-    background-color: white;
-    color: black;
-    font-size: 15px;
-    cursor: pointer;
-   /* box-shadow: 2px 2px 5px rgba(0,0,0,0.15); */
-    font-size: 12px;
-}
-.drop-down{
-    display: flex;
-    align-items: center;
-    position: relative;
-}
-.drop-down-container{
-    display: none;
-    background-color: rgb(237, 236, 236);
-    width: 100px;
-    position: absolute;
-    z-index: 100;
-    top: 30px;
-    border-style: solid;
-    border: none;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.15);
-}
-.drop-down-container a{
-    display: block;
-    text-decoration: none;
-    color: black;
-    background-color: rgb(237, 236, 236);
-    padding-left: 10px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-}
-.drop-down:hover .drop-down-container{
-    display: block;
-}
-.drop-down-container a:hover{
-    background-color: rgb(213, 208, 208);
-}
-
-
-
-.dashboard,.view-donors,.view-pending,
-.donors-current,.appointments,.emergency-request,
-.request,.donate,.edit,.donor-details,.donor-filtered,.donor-filtered-emergency{
+            
+.view-donors,.request,.donate,.donor-details{
     display: none;
 }
 .active{
@@ -274,9 +66,7 @@ body{
 .donors-table{
     border-collapse: separate;
     border-spacing: 0 20px;
-    width: 1240px;
-    min-width: 1000px;
-    margin: 30 15 0 0;
+    width: 100%;
     /*box-shadow: 2px 2px 10px rgba(0,0,0,0.4);*/
     border-radius: 10px;
     padding: 5px;
@@ -312,78 +102,6 @@ body{
 
 /* ********************* */
 
-
-.header-leftpart{
-    flex: 1;
-    
-}
-.header-rightpart{
-    width: 400px;
-    
-    display: flex;
-    flex-direction: row;
-    justify-content: left;
-    align-items: center;
-    
-}
-.search-box{
-    width: 775px;
-    min-width: 300px;
-    margin-left: 50px;
-    height: 40px;
-    border-radius: 20px;
-    padding-left: 20px;
-    border: none;
-    box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
-}
-.filter{
-    display: flex;
-    /*background-color: #F1F3F4; */
-    height: 60px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 15px;
-    padding-right: 15px;
-    align-items: center;
-    justify-content: left;
-    width: 600px;
-
-    border-radius: 10px;
-}
-.filter button{
-    width: 125px;
-}
-.filter button:hover{
-    font-weight: bold;
-    color: black;
-    font-size: 17px;
-}
-.sort-button{
-    margin-right: 5px;
-    height: 50px;
-    border-radius: 25px;
-    border: none;
-    cursor: pointer;
-    background-color: #EBEDEF;
-    font-size: 17px;
-}
-.groupby-button{
-    margin-right: 5px;
-    height: 50px;
-    border-radius: 25px;
-    border: none;
-    cursor: pointer;
-    background-color: #EBEDEF;
-    font-size: 17px;
-}
-.addnewtask-button{
-    height: 50px;
-    border-radius: 25px;
-    border: none;
-    cursor: pointer;
-    background-color: #EBEDEF;
-    font-size: 17px;
-}
 .donors-flex1{
     display: flex;
     flex-direction: row;
@@ -437,83 +155,70 @@ body{
 .donors-flex2{
     display: flex;
     flex-direction: row;
-   
     height: 410px;
+    flex-grow: 1;
 }
-.donor-details,.req-donor-details,.emergency-req-donor-details{
+.donor-details{
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     background-color: #FAFBFB;
-    width: 400px;
     border-radius: 15px;
     margin-right: 15px;
     padding: 10px;
     padding-top: 30px;
-    display: none;
+    flex-grow: 1;
 }
-.donor-details label,.req-donor-details label,.emergency-req-donor-details label{
+.donor-details-col{
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 0 10px;
+}
+.donor-details label{
     margin-top: 5px;
 }
-.donor-details input,.req-donor-details input,.emergency-req-donor-details input{
+.donor-details input, .donor-details select{
     margin-left: 10px;
     margin-right: 10px;
     margin-top: 5px;
     margin-bottom: 5px;
     border-radius: 10px;
-    border: none;
+    border: 1px solid #ccc;
     height: 55px;
-    box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+    padding: 0 10px;
     
 }
-.donor-details,.req-donor-details,.emergency-req-donor-details{
+.donor-details{
     position: relative;
 }
-.prev-page-icon{
-    position: absolute;
-    height: 20px;
-    top: 5px;
-    left: 3px;
-    cursor: pointer;
+.donors-flex2{
+    display: flex;
+    flex-direction: row;
+    height: 410px;
+    flex-grow: 1;
+}
+.button-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 15px;
 }
 .reg-submit-button{
     background-color: rgb(189, 186, 186);
     border: none;
     border-radius: 15px;
-    margin-top: 10px;
     height: 60px;
-    width: 100px;
-    margin-left:150px;
-    margin-bottom: 10px;
+    width: 120px;
     box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
     cursor: pointer;
     font-size: 15px;
     font-weight: bold;
     color:rgb(71, 70, 70);
-    padding-top: 8px;
-    padding-bottom: 8px;
 }
-.register-donor,.search-donor,.register-success,.search-donor-emergency{
-    background-color: #EBEDEF;
-    width: 400px;
-    height: 200px;
-    border-radius: 15px;
-    margin-right: 15px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    display: none;
-}
-.register-donor label,.search-donor label,.register-success label,.search-donor-emergency label{
-    font-weight: 900;
-    font-size: 30px;
-}
-.hospital-inventory{
-    background-color: #EBEDEF;
+.donors-flex2 .hospital-inventory,
+.donors-flex2 .compatible-bgp {
     flex: 1;
-    border-radius: 15px;
-    margin-right: 10px;
 }
 .hospital-inventory p{
     margin-left: 10px;
@@ -592,130 +297,14 @@ body{
 .bloodgp-dropdown{
     height: 60px;
     border-radius: 10px;
-    border: none;
-    box-shadow: 2px 2px 10px rgba(0,0,0,0.4);
-
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+    padding: 0 10px;
     margin-left: 10px;
     margin-right: 10px;
     margin-top: 5px;
     margin-bottom: 5px;
 }
-.pending-delete-button{
-    background-color: rgb(140, 68, 68);
-    color: white;
-    border-radius: 10px;
-    border: none;
-    box-shadow: 2px 2px 10px rgba(0,0,0,0.4);;
-    padding-left:10px;
-    padding-right: 10px;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    cursor: pointer;
-}
-
-
-.blood-chart{
-    width: 400px;
-    height: 400px;
-    /*display: flex;*/  
-}
-
-.donation-chart{
-    width: 600px;
-    height: 600px;
-}
-.dashboard-flex1{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-around;
-}
-
-.blood-compatibility {
-    width: 100%;
-    border-collapse: separate;
-    box-shadow: 2px 2px 10px rgba(0,0,0,0.4);
-    overflow: hidden;
-    background: white;
-    border-radius: 12px;
-}
-.dashboard-flex2{
-    display: flex;
-    margin-top: 20px;
-    justify-content: center;
-}
-.donor-agechart{
-    width: 300px;
-    margin-right: 60px;
-    margin-top: 50px;
-}
-.donor-bloodchart{
-    width: 300px;
-    margin-top: 50px;
-}
-.blood-compatibility th, .blood-compatibility td {
-    padding: 10px;
-}
-
-.blood-compatibility{
-    border-collapse: collapse;
-    border: none;
-    flex: 1;
-    margin-left: 10px;
-    margin-right: 20px;;
-}
-.blood-compatibility th, 
-.blood-compatibility td {
-    border: none; 
-    text-align: left;
-    font-weight: 500;
-}
-.blood-compatibility th{
-    background-color: rgb(238, 107, 107);
-    font-size: 17px;
-    font-weight: 800;
-}
-.blood-compatibility td{
-    background-color: rgb(238, 237, 237);
-}
-.blood-compatibility tbody td:hover{
-    background-color: rgb(223, 221, 221);
-}
-
-
-
-.edit-container{
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    row-gap: 60px;
-    column-gap: 40px;
-  
-    margin-top: 20px;
-    margin-left: 20px;
-    margin-right: 20px;
-}
-.edit-container div{
-    background-color: rgb(195, 197, 198);
-    height: 300px;
-    border-radius: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.edit-container img{
-    height: 250px;
-    border-radius: 50%;
-}
-
-.sidebar button:hover{
-    font-weight: bold;
-    font-size: 15px;
-}
 .bold{
     font-weight: bold;
 }
-.button-size{
-    font-size: 15px;
-}
-            
-        
