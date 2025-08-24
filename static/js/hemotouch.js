@@ -13,7 +13,10 @@ async function fetchConfig() {
 }
 
 function showsection(section){
-//... existing code
+    document.querySelector('.request').classList.remove('active');
+    document.querySelector('.donate').classList.remove('active');
+    document.querySelector('.view-donors').classList.remove('active');
+    
     document.querySelector('.'+section).classList.add('active');
 }
 
