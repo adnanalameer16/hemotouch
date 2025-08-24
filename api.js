@@ -9,14 +9,14 @@ app.use(express.json());
 const port = process.env.API_PORT || 3000;
 
 
+// NEW CODE (Correct for Render/Neon)
+const { Pool } = require('pg');
 const pool = new Pool({
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_DATABASE,
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT || 5432,
-  });
-
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
 
 // Start server
 app.listen(port, () => {
