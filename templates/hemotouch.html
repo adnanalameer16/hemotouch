@@ -1,133 +1,152 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <link rel="stylesheet" type="text/css" href="static\css\hemotouch_styles.css">
-        <title>HEMOTOUCH</title>
-    </head>
-    <body>
-        <div class="header">
-            <div class="logo">
-                <b>HEMOTOUCH</b>
-            </div>
-            <div class="header-buttons">
-                <button class="header-button bold" onclick="showsection('request'); show_button_bold(this);">REQUEST</button>
-                <button class="header-button" onclick="showsection('donate'); show_button_bold(this);">DONATE</button>
-                <button class="header-button"  onclick="showsection('view-donors'); view_donors_table(); show_button_bold(this);">VIEW-DONORS</button>
-            </div>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEMOTOUCH - Blood Bank Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/hemotouch_styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <h1>HEMOTOUCH</h1>
         </div>
-        <div class="main-content">
-            <div class="view-donors">
-                <table class="donors-table">
+        <nav class="main-nav">
+            <button class="nav-button active" data-section="request">Request Blood</button>
+            <button class="nav-button" data-section="donate">Donate Blood</button>
+            <button class="nav-button" data-section="view-donors">View Donors</button>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <section id="request" class="content-section active">
+            <div class="content-grid">
+                <div class="card">
+                    <h3>Patient Fingerprint</h3>
+                    <div class="fingerprint-upload" id="uploadFrame">
+                        <p id="uploadText">Click to upload fingerprint</p>
+                        <input type="file" id="imageInput" accept="image/*" hidden>
+                        <img id="uploadedImage" src="" alt="Uploaded Fingerprint" style="display: none;">
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Detected Blood Group</h3>
+                    <div class="blood-group-display">
+                        <p id="disphere">N/A</p>
+                    </div>
+                </div>
+                <div class="card card-full-width">
+                    <h3>Hospital Inventory</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Blood Group</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bloodgp-quantity-table"></tbody>
+                    </table>
+                </div>
+                <div class="card card-full-width">
+                    <h3>Compatible Blood Groups</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Compatible Groups</th>
+                            </tr>
+                        </thead>
+                        <tbody id="compatible-blood-table"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="donate" class="content-section">
+            <div class="content-grid">
+                <div class="card">
+                    <h3>Donor Fingerprint</h3>
+                    <div class="fingerprint-upload" id="uploadFrame2">
+                        <p id="uploadText2">Click to upload fingerprint</p>
+                        <input type="file" id="imageInput2" accept="image/*" hidden>
+                        <img id="uploadedImage2" src="" alt="Uploaded Fingerprint" style="display: none;">
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Detected Blood Group</h3>
+                    <div class="blood-group-display">
+                        <p id="disphere2">N/A</p>
+                    </div>
+                </div>
+                <div class="card form-card card-full-width">
+                    <h3>Donor Details</h3>
+                    <form id="donor-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="name">Name</label>
+                                <input type="text" id="name" placeholder="Enter name">
+                            </div>
+                            <div class="form-group">
+                                <label for="age">Age</label>
+                                <input type="text" id="age" placeholder="Enter age">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="bloodgp-dropdown-don">Blood Group</label>
+                                <select id="bloodgp-dropdown-don">
+                                    <option value="" disabled selected>Select Blood Group</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="diseases">Existing Diseases</label>
+                                <input type="text" id="diseases" placeholder="e.g., None">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="phno">Phone Number</label>
+                                <input type="text" id="phno" placeholder="Enter phone number">
+                            </div>
+                            <div class="form-group">
+                                <label for="address">Address</label>
+                                <input type="text" id="address" placeholder="Enter address">
+                            </div>
+                        </div>
+                        <button type="button" class="submit-button" onclick="validateAndSubmitDonor()">Register as Donor</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-donors" class="content-section">
+            <h2>Available Donors</h2>
+            <div class="card">
+                <table class="data-table">
                     <thead>
                         <tr>
-                            <th>NAME</th>
-                            <th>AGE</th>
-                            <th>BLOOD_GROUP</th>
-                            <th>DISEASES</th>
-                            <th>PHONE_NO</th>
-                            <th>ADDRESS</th>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Blood Group</th>
+                            <th>Diseases</th>
+                            <th>Phone No</th>
+                            <th>Address</th>
                         </tr>
                     </thead>
                     <tbody id="donor-table"></tbody>
                 </table>
             </div>
-            <div class="request active">
-                <div class="donors-flex1">
-                    <div class="fingerprint-outerframe">
-                        <div class="fingerprint-innerframe" id="uploadFrame">
-                                <p id="uploadText">Click to upload fingerprint</p>
-                                <input type="file" id="imageInput" accept="image/*" hidden>
-                                <img id="uploadedImage" src="" alt="" style="display: none;">
-                        </div>
-                    </div>
-                    <div class="result">
-                        <p style="width: 100px;">Detected Blood Group</p>
-                        <div class="predicted-bgp"><label class="blood-gp"><P id="disphere"></P></label></div>
-                    </div>
-                </div>
-                <div class="donors-flex2">
-                    <div class="hospital-inventory">
-                        <p>Hospital Inventory</p>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>BLOOD GROUP</th>
-                                    <th>QUANTITY</th>
-                                </tr>
-                            </thead>
-                            <tbody id="bloodgp-quantity-table">
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="compatible-bgp">
-                        <p>Comaptible Blood Groups</p>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>
-                                       
-                                    </th>
-                                </tr>
-                            <thead>
-                            <tbody id="compatible-blood-table">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+        </section>
+    </main>
 
-            <div class="donate">
-                <div class="donors-flex1">
-                    <div class="fingerprint-outerframe">
-                        <div class="fingerprint-innerframe" id="uploadFrame2">
-                            <p id="uploadText2">Click to upload fingerprint</p>
-                                <input type="file" id="imageInput2" accept="image/*" hidden>
-                                <img id="uploadedImage2" src="" alt="" style="display: none;">
-                        </div>
-                    </div>
-                    <div class="result">
-                        <p style="width: 100px;">Detected Blood Group</p>
-                        <div class="predicted-bgp"><label class="blood-gp" id="disphere2"></label></div>
-                    </div>
-                </div>
-                <div class="donors-flex2">
-                    <div class="donor-details activate">
-                        <div class="donor-details-col">
-                            <label>Name</label>
-                            <input type="text" id="name" placeholder="name">
-                            <label>Age</label>
-                            <input type="text" id="age" placeholder="age">
-                            <label>Blood Group</label>
-                            <select class="bloodgp-dropdown" id="bloodgp-dropdown-don">
-                                <option value="" disabled selected>Blood Group</option>
-                                <option value="A+">A+</option>
-                                <option value="A-">A-</option>
-                                <option value="B+">B+</option>
-                                <option value="B-">B-</option>
-                                <option value="AB+">AB+</option>
-                                <option value="AB-">AB-</option>
-                                <option value="O+">O+</option>
-                                <option value="O-">O-</option>
-                            </select>
-                        </div>
-                        <div class="donor-details-col">
-                            <label>Diseases</label>
-                            <input type="text" id="diseases" placeholder="disease">
-                            <label>Phno</label>
-                            <input type="text" id="phno" placeholder="Phno">
-                            <label>Address</label>
-                            <input type="text" id="address" placeholder="Address">
-                        </div>
-                    </div>
-                </div>
-                <div class="button-container">
-                    <button class="reg-submit-button" onclick="validateAndSubmitDonor()">Donate</button>
-                </div>
-            </div>
-
-            
-        </div>
-    <script src="static/js/hemotouch.js"></script>
-        
-    </body>
+    <script src="/static/js/hemotouch.js"></script>
+</body>
 </html> 

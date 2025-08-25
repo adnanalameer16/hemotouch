@@ -12,23 +12,25 @@ async function fetchConfig() {
     }
 }
 
-function showsection(section){
-    document.querySelector('.request').classList.remove('active');
-    document.querySelector('.donate').classList.remove('active');
-    document.querySelector('.view-donors').classList.remove('active');
-    
-    document.querySelector('.'+section).classList.add('active');
-}
+function setupNavigation() {
+    const navButtons = document.querySelectorAll('.nav-button');
+    const contentSections = document.querySelectorAll('.content-section');
 
-function show_button_bold(selectedbutton){
-    // Remove bold class from all sidebar buttons
-    const buttons = document.querySelectorAll('.header-button');
-    buttons.forEach(button => {
-        button.classList.remove('bold');
+    navButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const sectionId = button.getAttribute('data-section');
+            
+            navButtons.forEach(btn => btn.classList.remove('active'));
+            contentSections.forEach(section => section.classList.remove('active'));
+            
+            button.classList.add('active');
+            document.getElementById(sectionId).classList.add('active');
+
+            if (sectionId === 'view-donors') {
+                view_donors_table(); // Load all donors when switching to this tab
+            }
+        });
     });
-
-    // Add bold class to the selected button
-    selectedbutton.classList.add('bold');
 }
 
 function setupFingerprintUpload(frameId, inputId, imageId, textId, resultId, callback) {
@@ -37,201 +39,101 @@ function setupFingerprintUpload(frameId, inputId, imageId, textId, resultId, cal
     const uploadedImage = document.getElementById(imageId);
     const uploadText = document.getElementById(textId);
 
-    if (!uploadFrame) return; // Exit if the element doesn't exist on the page
+    if (!uploadFrame) return;
 
-    // Open file picker when clicking on the frame
-    uploadFrame.addEventListener("click", function () {
-        imageInput.click();
-    });
+    uploadFrame.addEventListener("click", () => imageInput.click());
 
-    // Handle file selection
-    imageInput.addEventListener("change", function () {
+    imageInput.addEventListener("change", () => {
         const file = imageInput.files[0];
-
         if (file) {
             const reader = new FileReader();
-            reader.onload = function (e) {
+            reader.onload = (e) => {
                 uploadedImage.src = e.target.result;
                 uploadedImage.style.display = "block";
-                if (uploadText) uploadText.style.display = "none"; // Hide text when image is uploaded
+                if (uploadText) uploadText.style.display = "none";
             };
             reader.readAsDataURL(file);
-
-            // Send the image to Flask for prediction
-            uploadImageToFlask(file);
+            uploadImageToFlask(file, resultId, callback);
         }
     });
-
-    // Function to send image to Flask
-    function uploadImageToFlask(file) {
-        let formData = new FormData();
-        formData.append("file", file);
-
-        fetch(`${predictApiUrl}/predict`, {  // Flask endpoint
-            method: "POST",
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Display the predicted blood group
-            const resultElement = document.querySelector(resultId);
-            if (resultElement) {
-                resultElement.textContent = data.prediction;
-            }
-            
-            // If a callback function is provided, call it with the prediction
-            if (callback) {
-                callback(data.prediction);
-            }
-        })
-        .catch(error => console.error("Error:", error));
-    }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    fetchConfig().then(() => {
-        // Setup for the 'Request' section fingerprint scanner
-        setupFingerprintUpload("uploadFrame", "imageInput", "uploadedImage", "uploadText", "#disphere", fetchCompatibleBloodGroups);
+function uploadImageToFlask(file, resultId, callback) {
+    const formData = new FormData();
+    formData.append("file", file);
 
-        // Setup for the 'Donate' section fingerprint scanner
-        setupFingerprintUpload("uploadFrame2", "imageInput2", "uploadedImage2", "uploadText2", "#disphere2");
-        
-        // Load initial data
-        loadBloodInventory();
-    });
-});
+    fetch(`${predictApiUrl}/predict`, {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        const resultElement = document.querySelector(resultId);
+        if (resultElement) {
+            resultElement.textContent = data.prediction || 'N/A';
+        }
+        if (callback) {
+            callback(data.prediction);
+        }
+    })
+    .catch(error => console.error("Error:", error));
+}
 
 async function validateAndSubmitDonor() {
-const name = document.getElementById("name").value.trim();
-const age = document.getElementById("age").value.trim();
-const bloodgp = document.getElementById("bloodgp-dropdown-don").value;
-const diseases = document.getElementById("diseases").value.trim();
-const phno = document.getElementById("phno").value.trim();
-const address = document.getElementById("address").value.trim();
+    const name = document.getElementById("name").value.trim();
+    const age = document.getElementById("age").value.trim();
+    const bloodgp = document.getElementById("bloodgp-dropdown-don").value;
+    const diseases = document.getElementById("diseases").value.trim();
+    const phno = document.getElementById("phno").value.trim();
+    const address = document.getElementById("address").value.trim();
 
-// 1. Check for empty fields
-if (!name || !age || !bloodgp || !diseases || !phno || !address) {
-alert("All fields are required.");
-return;
-}
+    if (!name || !age || !bloodgp || !diseases || !phno || !address) {
+        alert("All fields are required.");
+        return;
+    }
+    if (!/^[A-Za-z\s]+$/.test(name)) {
+        alert("Please enter a valid name (letters and spaces only).");
+        return;
+    }
+    const ageNum = parseInt(age, 10);
+    if (isNaN(ageNum) || ageNum < 18 || ageNum > 65) {
+        alert("Please enter a valid age between 18 and 65.");
+        return;
+    }
+    if (!/^\d{10}$/.test(phno)) {
+        alert("Please enter a valid 10-digit phone number.");
+        return;
+    }
 
-// 2. Format validation
-const nameRegex = /^[A-Za-z\s]+$/;
-if (!nameRegex.test(name)) {
-alert("Please enter a valid name (letters and spaces only).");
-return;
-}
-
-const ageNum = parseInt(age, 10);
-if (isNaN(ageNum) || ageNum < 18 || ageNum > 65) {
-alert("Please enter a valid age between 18 and 65.");
-return;
-}
-
-const phnoRegex = /^\d{10}$/;
-if (!phnoRegex.test(phno)) {
-alert("Please enter a valid 10-digit phone number.");
-return;
-}
-
-// If all validation passes, proceed with submission
-const donorData = { name, age, bloodgp, diseases, phno, address };
-const bloodData = { bloodgp };
-
-try {
-const responses = await Promise.all([
-    fetch(`${apiUrl}/all/donorslist`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(donorData),
-    }),
-]);
-
-// Check if any of the responses were not successful
-const allSuccessful = responses.every(res => res.ok);
-
-if (allSuccessful) {
-    // Clear input fields
-    alert("Successfully Registered");
-    document.getElementById("name").value = "";
-    document.getElementById("age").value = "";
-    document.getElementById("bloodgp-dropdown-don").value = "";
-    document.getElementById("diseases").value = "";
-    document.getElementById("phno").value = "";
-    document.getElementById("address").value = "";
-    
-    // Show success message
-    document.querySelector('.donor-details').classList.remove('activate');
-    document.querySelector('.register-success').classList.add('activate');
-
-} else {
-    // Find the first failed response to show an error
-    const failedResponse = await responses.find(res => !res.ok).json();
-    alert(`Error: ${failedResponse.error || 'An unknown error occurred.'}`);
-}
-
-} catch (error) {
-console.error("Error during submission:", error);
-alert("A network error occurred. Please try again.");
-}
-}
-
-//fetch view-donors table
-function view_donors_table(){
-    const donor_table=document.getElementById('donor-table');
-    donor_table.innerHTML = "";
-fetch(`${apiUrl}/donorslist`)
-.then(response => response.json())
-.then(data => {
-    data.forEach(donor => {
-        const row = `<tr>
-            <td>${donor.name}</td>
-            <td>${donor.age}</td>
-            <td>${donor.bloodgp}</td>
-            <td>${donor.diseases}</td>
-            <td>${donor.phno}</td>
-            <td>${donor.address}</td>
-        </tr>`;
-        donor_table.innerHTML += row;
-    });
-})
-.catch(error => console.error("Error fetching data:", error));
-}
-
-//fetch compatible bloodgp-request
-async function fetchCompatibleBloodGroups(bloodGroup) {
-    const selectedBloodGroup = bloodGroup;
-    if (!selectedBloodGroup) return;
+    const donorData = { name, age, bloodgp, diseases, phno, address };
 
     try {
-        const response = await fetch(`${apiUrl}/compatible_bgp/${selectedBloodGroup}`);
-        const data = await response.json();
+        const response = await fetch(`${apiUrl}/all/donorslist`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(donorData),
+        });
 
-        const tableBody = document.getElementById("compatible-blood-table");
-        tableBody.innerHTML = "";
-
-        if (data.length > 0) {
-            data.forEach(bloodGroup => {
-                const row = `<tr onclick="fetchDonorsByBloodGroup('${bloodGroup}')" style="cursor:pointer;"><td>${bloodGroup}</td></tr>`;
-                tableBody.innerHTML += row;
-            });
+        if (response.ok) {
+            alert("Successfully Registered");
+            document.getElementById("donor-form").reset();
         } else {
-            tableBody.innerHTML = "<tr><td>No data found</td></tr>";
+            const errorData = await response.json();
+            alert(`Error: ${errorData.error || 'An unknown error occurred.'}`);
         }
     } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error during submission:", error);
+        alert("A network error occurred. Please try again.");
     }
 }
 
-function fetchDonorsByBloodGroup(bloodGroup) {
-    // Fetch donors from the server
-    fetch(`${apiUrl}/donors/all?bloodgp=${encodeURIComponent(bloodGroup)}`)
-        .then(response => response.json())
-        .then(data => {
-            const donorList = document.getElementById('donor-filtered-table');
-            donorList.innerHTML = ""; // Clear previous results
+function view_donors_table(donors) {
+    const donor_table_body = document.getElementById('donor-table');
+    donor_table_body.innerHTML = "";
 
-            data.forEach(donor => {
+    const renderDonors = (donorList) => {
+        if (donorList && donorList.length > 0) {
+            donorList.forEach(donor => {
                 const row = `<tr>
                     <td>${donor.name}</td>
                     <td>${donor.age}</td>
@@ -239,33 +141,93 @@ function fetchDonorsByBloodGroup(bloodGroup) {
                     <td>${donor.diseases}</td>
                     <td>${donor.phno}</td>
                     <td>${donor.address}</td>
-                    <td>${donor.date_of_donation}</td>
-                    </tr>`;
-                    donorList.innerHTML += row;
+                </tr>`;
+                donor_table_body.innerHTML += row;
             });
-            showsection("donor-filtered");
+        } else {
+            donor_table_body.innerHTML = '<tr><td colspan="6">No donors found.</td></tr>';
+        }
+    };
+
+    if (donors) {
+        renderDonors(donors);
+    } else {
+        fetch(`${apiUrl}/donorslist`)
+            .then(response => response.json())
+            .then(data => renderDonors(data))
+            .catch(error => {
+                console.error("Error fetching data:", error);
+                donor_table_body.innerHTML = '<tr><td colspan="6">Error loading donors.</td></tr>';
+            });
+    }
+}
+
+async function fetchCompatibleBloodGroups(bloodGroup) {
+    if (!bloodGroup) return;
+
+    try {
+        const response = await fetch(`${apiUrl}/compatible_bgp/${bloodGroup}`);
+        const data = await response.json();
+
+        const tableBody = document.getElementById("compatible-blood-table");
+        tableBody.innerHTML = "";
+
+        if (data.length > 0) {
+            data.forEach(group => {
+                const row = `<tr onclick="fetchDonorsByBloodGroup('${group}')" style="cursor:pointer;"><td>${group}</td></tr>`;
+                tableBody.innerHTML += row;
+            });
+        } else {
+            tableBody.innerHTML = "<tr><td>No compatible groups found</td></tr>";
+        }
+    } catch (error) {
+        console.error("Error fetching compatible blood groups:", error);
+    }
+}
+
+function fetchDonorsByBloodGroup(bloodGroup) {
+    fetch(`${apiUrl}/donors/all?bloodgp=${encodeURIComponent(bloodGroup)}`)
+        .then(response => response.json())
+        .then(data => {
+            document.querySelector('.nav-button[data-section="view-donors"]').click();
+            view_donors_table(data);
         })
         .catch(error => console.error("Error fetching donors:", error));
 }
 
-
-//blood quantity in hospital inventory-request
 async function loadBloodInventory() {
     try {
         const response = await fetch(`${apiUrl}/api/blood_quantity`);
         const data = await response.json();
 
         const tableBody = document.getElementById("bloodgp-quantity-table");
-        tableBody.innerHTML = ""; // Clear existing rows
+        tableBody.innerHTML = "";
 
-        data.forEach((item) => {
-            const row = `<tr>
+        if (data.length > 0) {
+            data.forEach((item) => {
+                const row = `<tr>
                     <td>${item.bloodgp}</td>
                     <td>${item.quantity} Unit</td>
                 </tr>`;
                 tableBody.innerHTML += row;
-        });
+            });
+        } else {
+            tableBody.innerHTML = '<tr><td colspan="2">Inventory data not available.</td></tr>';
+        }
     } catch (error) {
         console.error("Error fetching blood inventory:", error);
+        const tableBody = document.getElementById("bloodgp-quantity-table");
+        tableBody.innerHTML = '<tr><td colspan="2">Error loading inventory.</td></tr>';
     }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    fetchConfig().then(() => {
+        setupNavigation();
+        
+        setupFingerprintUpload("uploadFrame", "imageInput", "uploadedImage", "uploadText", "#disphere", fetchCompatibleBloodGroups);
+        setupFingerprintUpload("uploadFrame2", "imageInput2", "uploadedImage2", "uploadText2", "#disphere2");
+        
+        loadBloodInventory();
+    });
+});
