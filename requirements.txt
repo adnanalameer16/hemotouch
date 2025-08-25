@@ -1,6 +1,5 @@
-flask
-tensorflow
-numpy
-Pillow
-gunicorn
+Flask
+requests
 python-dotenv
+Pillow
+numpy
