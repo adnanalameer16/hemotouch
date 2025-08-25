@@ -10,18 +10,18 @@ document.getElementById("toggle-btn").addEventListener("click", function (event)
     event.preventDefault();
     
     let formTitle = document.getElementById("form-title");
-    let confirmPassword = document.getElementById("confirm-password");
+    let confirmPasswordGroup = document.getElementById("confirm-password-group");
     let toggleText = document.getElementById("toggle-text");
     let toggleBtn = document.getElementById("toggle-btn");
 
-    if (confirmPassword.classList.contains("hidden")) {
+    if (confirmPasswordGroup.classList.contains("hidden")) {
         formTitle.innerText = "Create Account";
-        confirmPassword.classList.remove("hidden");
+        confirmPasswordGroup.classList.remove("hidden");
         toggleText.innerText = "Already have an account?";
         toggleBtn.innerText = "Login";
     } else {
         formTitle.innerText = "Login";
-        confirmPassword.classList.add("hidden");
+        confirmPasswordGroup.classList.add("hidden");
         toggleText.innerText = "Don't have an account?";
         toggleBtn.innerText = "Create Account";
     }
