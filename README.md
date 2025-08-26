@@ -1,5 +1,5 @@
 # HEMOTOUCH
-[hemotouch.com](https://hemotouch-python-api.onrender.com)
+[hemotouch.com](https://hemotouch-python-api.onrender.com) Note:- This might not start running immediately as I am using the free version of render to host the application
 
 [You can get sample data here](https://drive.google.com/drive/folders/1e_8LZpUcKh3krExg_nqZq7oSTvtXGGKn?usp=drive_link )
 
