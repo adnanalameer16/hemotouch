@@ -3,6 +3,12 @@
 
 [You can get sample data here](https://drive.google.com/drive/folders/1e_8LZpUcKh3krExg_nqZq7oSTvtXGGKn?usp=drive_link )
 
+To Login use:
+
+demo@gmail.com
+
+123456
+
 **Predicting Blood Group from Fingerprint Images for Hospital Blood Bank Management**
 
 HEMOTOUCH is an innovative system that uniquely combines deep learning and hospital management. Its core feature is the ability to predict a person's blood group directly from a fingerprint image using advanced convolutional neural networks (CNNs). This breakthrough enables rapid, non-invasive blood group identification, which can be especially valuable in emergency situations or for populations without prior blood group records.
